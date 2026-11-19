@@ -12,14 +12,15 @@
 CREATE TABLE clients (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL
+    email VARCHAR(255) UNIQUE NOT NULL
 );
 
 CREATE TABLE accounts (
     id BIGSERIAL PRIMARY KEY,
     client_id BIGINT NOT NULL,
-    account_number VARCHAR(34) NOT NULL,
-    balance NUMERIC(19,4) NOT NULL DEFAULT 0
+    account_number VARCHAR(34) UNIQUE NOT NULL,
+    balance NUMERIC(19,4) NOT NULL DEFAULT 0,
+    foreign key (client_id) REFERENCES clients(id)
 );
 
 CREATE TABLE transactions (
@@ -27,5 +28,8 @@ CREATE TABLE transactions (
     account_id BIGINT NOT NULL,
     amount NUMERIC(19,4) NOT NULL,
     type VARCHAR(20) NOT NULL,
-    transaction_date TIMESTAMP NOT NULL DEFAULT now()
+    transaction_date TIMESTAMP NOT NULL DEFAULT now(),
+    foreign key (account_id) references accounts(id)
 );
+
+CREATE INDEX idx_transactions_account_id_transaction_date ON transactions (account_id, transaction_date);

@@ -1,9 +1,8 @@
-package com.minibank;
+package com.minibank.model;
 
 import java.math.BigDecimal;
 
 public class Account {
-
     private final Long id;
     private final Long clientId;
     private final String accountNumber;
