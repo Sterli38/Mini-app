@@ -1,7 +1,6 @@
-package com.minibank;
+package com.minibank.model;
 
 public class Client {
-
     private final Long id;
     private final String name;
     private final String email;

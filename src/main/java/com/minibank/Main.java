@@ -1,9 +1,14 @@
 package com.minibank;
 
+import com.minibank.config.ConnectionFactory;
+import com.minibank.exception.NotFoundException;
+import com.minibank.model.Account;
+import com.minibank.model.Client;
+import com.minibank.service.BankService;
+
 import java.math.BigDecimal;
 
 public class Main {
-
     public static void main(String[] args) {
         BankService bank = new BankService(new ConnectionFactory());
 
@@ -27,7 +32,7 @@ public class Main {
         BigDecimal balanceBefore = bank.getAccount(account1.getId()).getBalance();
         try {
             bank.transfer(account1.getId(), 999_999L, new BigDecimal("50.00"));
-        } catch (IllegalArgumentException e) {
+        } catch (NotFoundException e) {
             System.out.println("Ошибка (как и ожидалось): " + e.getMessage());
         }
         BigDecimal balanceAfter = bank.getAccount(account1.getId()).getBalance();

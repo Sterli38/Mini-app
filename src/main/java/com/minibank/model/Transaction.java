@@ -1,10 +1,9 @@
-package com.minibank;
+package com.minibank.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Transaction {
-
     private final Long id;
     private final Long accountId;
     private final BigDecimal amount;
