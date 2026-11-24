@@ -15,11 +15,6 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-/**
- * Общее для всех хендлеров: проверка POST, чтение JSON,
- * перевод исключений в HTTP-коды и отправка ответа.
- * Наследник пишет только process() — что делать с запросом.
- */
 public abstract class BaseHandler implements HttpHandler {
     protected final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -41,7 +36,7 @@ public abstract class BaseHandler implements HttpHandler {
         } catch (InsufficientFundsException | AlreadyExistsException e) {
             sendError(exchange, 409, e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace(); // причина 500-й — в консоль сервера, клиенту детали не отдаём
+            e.printStackTrace();
             sendError(exchange, 500, "Internal Server Error");
         }
     }

@@ -1,12 +1,33 @@
 package com.minibank.model;
 
-public class Client {
-    private final Long id;
-    private final String name;
-    private final String email;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
-    public Client(Long id, String name, String email) {
-        this.id = id;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "clients")
+public class Client {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name = "name", nullable = false)
+    private String name;
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+    @OneToMany(mappedBy = "client")
+    private List<Account> accounts = new ArrayList<>();
+
+    protected Client() {
+    }
+
+    public Client(String name, String email) {
         this.name = name;
         this.email = email;
     }
@@ -14,4 +35,5 @@ public class Client {
     public Long getId() { return id; }
     public String getName() { return name; }
     public String getEmail() { return email; }
+    public List<Account> getAccounts() { return accounts; }
 }
