@@ -1,21 +1,24 @@
 package com.minibank;
 
+import com.minibank.config.JpaConfig;
+import com.minibank.exception.NotFoundException;
+import com.minibank.dto.AccountResponse;
+import com.minibank.dto.ClientResponse;
+import com.minibank.service.BankService;
+
 import java.math.BigDecimal;
 
 public class Main {
-
     public static void main(String[] args) {
-        BankService bank = new BankService();
+        BankService bank = new BankService(JpaConfig.entityManagerFactory());
 
-        Client client = bank.registerClient("Ivan Petrov", "ivan@example.com");
-        Account account1 = bank.openAccount(client.getId(), "ACC-001");
-        Account account2 = bank.openAccount(client.getId(), "ACC-002");
+        long run = System.currentTimeMillis();
 
-        // Пополняем account1 "вручную" переводом с самого себя не получится —
-        // для демо просто задаём баланс напрямую через первый перевод
-        // от несуществующего служебного счёта нет смысла эмулировать,
-        // поэтому просто выставим баланс через пакетный доступ в демо:
-        account1.setBalance(new BigDecimal("1000.00"));
+        ClientResponse client = bank.registerClient("Ivan Petrov", "ivan" + run + "@example.com");
+        AccountResponse account1 = bank.openAccount(client.getId(), "ACC-" + run + "-1");
+        AccountResponse account2 = bank.openAccount(client.getId(), "ACC-" + run + "-2");
+
+        bank.deposit(account1.getId(), new BigDecimal("1000.00"));
 
         System.out.println("=== Обычный перевод ===");
         bank.transfer(account1.getId(), account2.getId(), new BigDecimal("100.00"));
@@ -23,16 +26,18 @@ public class Main {
         System.out.println("account2 balance: " + bank.getAccount(account2.getId()).getBalance());
 
         System.out.println();
-        System.out.println("=== Перевод на несуществующий счёт (баг) ===");
+        System.out.println("=== Перевод на несуществующий счёт (баг модуля 4–5, теперь исправлен) ===");
         BigDecimal balanceBefore = bank.getAccount(account1.getId()).getBalance();
         try {
-            bank.transfer(account1.getId(), 999L, new BigDecimal("50.00"));
-        } catch (IllegalArgumentException e) {
+            bank.transfer(account1.getId(), 999_999L, new BigDecimal("50.00"));
+        } catch (NotFoundException e) {
             System.out.println("Ошибка (как и ожидалось): " + e.getMessage());
         }
         BigDecimal balanceAfter = bank.getAccount(account1.getId()).getBalance();
         System.out.println("Баланс до попытки перевода: " + balanceBefore);
         System.out.println("Баланс после попытки перевода: " + balanceAfter);
         System.out.println("Деньги пропали: " + (balanceAfter.compareTo(balanceBefore) < 0));
+
+        JpaConfig.close();
     }
 }
